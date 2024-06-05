@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
     <title>魔法と物理の計算</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.2.0/chart.min.js"></script>
+    <script src="visualize.js"></script>
     <style>
         /* タブボタンのスタイル */
         .tab-button {
@@ -13,9 +15,13 @@
         /* フォームのスタイル */
         .form-container {
             display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr; /* 3つの列を均等に分割 */
+            gap: 10px; /* グリッド間の余白 */
         }
         .form-container .form-column {
-            flex-basis:50%;
+            grid-column: 1; /* 左領域 */
+            flex-basis:25%;
             flex: 1;
             padding: 20px;
         }
@@ -27,8 +33,11 @@
             padding: 5px;
             margin-bottom: 10px;
         }
-        .form-test {
-            flex-basis:50%;
+        .form-container .form-withoutEle {
+            grid-column: 2; /* 中央領域 */
+        }
+        .form-container .form-withEle {
+            grid-column: 3; /* 右領域 */
         }
     </style>
 </head>
@@ -42,26 +51,29 @@
         <!-- 魔法計算フォーム -->
         <div id="magic" class="form-column" style="display: block;">
             <h2>魔法計算</h2>
-            <p>知識: <input type="text" placeholder="知識を入力してください"></p>
-            <p>スキルLv: <input type="text" placeholder="スキルLvを入力してください"></p>
-            <p>強化値: <input type="text" placeholder="強化値を入力してください"></p>
-            <p>弱化値: <input type="text" placeholder="弱化値を入力してください"></p>
+            <p>知識:        <input type="number" id="knowledge" min="0" max="100000" value="1000"></p>
+            <p>スキルLv:    <input type="number" id="slv" min="1" max="600"  value="100"></p>
+            <p>強化値:      <input type="number" id="reinforce" min="0" max="600"  value="300"></p>
+            <p>弱化値:      <input type="number" id="weakness" min="0" max="240"  value="120"></p>
             <button onclick="calculateMagic()">計算</button>
         </div>
 
         <!-- 物理計算フォーム -->
         <div id="physics" class="form-column" style="display: none;">
             <h2>物理計算</h2>
-            <p>知識: <input type="text" placeholder="知識を入力してください"></p>
-            <p>スキルLv: <input type="text" placeholder="スキルLvを入力してください"></p>
-            <p>強化値: <input type="text" placeholder="強化値を入力してください"></p>
-            <p>弱化値: <input type="text" placeholder="弱化値を入力してください"></p>
+            <p>知識:        <input type="text" placeholder="知識を入力してください"></p>
+            <p>スキルLv:    <input type="text" placeholder="スキルLvを入力してください"></p>
+            <p>強化値:      <input type="text" placeholder="強化値を入力してください"></p>
+            <p>弱化値:      <input type="text" placeholder="弱化値を入力してください"></p>
             <button onclick="calculatePhysics()">計算</button>
         </div>
 
-        <div class="form-test">
-    
-    
+        <div class="form-withoutEle">
+            <canvas id="scatterChart"></canvas>
+        </div>
+
+        <div class="form-withEle">
+            <canvas id="scatterChart2"></canvas>
         </div>
     </div>
 
@@ -79,12 +91,53 @@
         // 魔法計算の処理
         function calculateMagic() {
             // ここに魔法計算のロジックを追加
+            console.log(knowledge.value);
         }
 
         // 物理計算の処理
         function calculatePhysics() {
             // ここに物理計算のロジックを追加
         }
+
+
+        // ファイルを読み込んで散布図を表示する部分のコードを追加します
+        // 散布図を作成
+        const ctx = document.getElementById('scatterChart');
+        const ctx2 = document.getElementById('scatterChart2');
+
+        const myChart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    data: [ // x, yのデータを入力
+                        { x: 1, y: 2 },
+                        { x: 2, y: 3 },
+                        { x: 3, y: 4 },
+                        { x: 4, y: 5 }
+                    ],
+                }],
+            },
+            options: {
+                // グラフの設定（必要に応じてカスタマイズ）
+            },
+        });
+
+        const myChart2 = new Chart(ctx2, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    data: [ // x, yのデータを入力
+                        { x: 1, y: 2 },
+                        { x: 2, y: 3 },
+                        { x: 3, y: 4 },
+                        { x: 4, y: 5 }
+                    ],
+                }],
+            },
+            options: {
+                // グラフの設定（必要に応じてカスタマイズ）
+            },
+        });
     </script>
 </body>
 </html>
