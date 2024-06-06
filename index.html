@@ -43,18 +43,19 @@
 </head>
 <body>
     <!-- タブボタン -->
-    <div class="tab-button" onclick="showTab('magic')">魔法計算</div>
-    <div class="tab-button" onclick="showTab('physics')">物理計算</div>
+    <div class="tab-button" onclick="showTab('magic')">魔法計算機</div>
+    <div class="tab-button" onclick="showTab('physics')">物理計算機</div>
 
     <!-- フォーム -->
     <div class="form-container">
         <!-- 魔法計算フォーム -->
         <div id="magic" class="form-column" style="display: block;">
             <h2>魔法計算</h2>
-            <p>知識:        <input type="number" id="knowledge" min="0" max="100000" value=1000></p>
-            <p>スキルLv:    <input type="number" id="slv" min="1" max="600"  value=100></p>
-            <p>強化値:      <input type="number" id="reinforce" min="0" max="600"  value=300></p>
-            <p>弱化値:      <input type="number" id="weakness" min="0" max="240"  value=120></p>
+            <p>知識:        <input type="number" id="knowledge" min=0 max=100000 value=1000></p>
+            <p>スキルLv:    <input type="number" id="slv" min=50 max=600  value=100></p>
+            <p>強化値:      <input type="number" id="reinforce" min=0 max=600  value=300></p>
+            <p>弱化値:      <input type="number" id="weakness" min=0 max=240  value=120></p>
+            <p>魔法抵抗:      <input type="number" id="weakness" min=-90 max=90  value=0></p>
             <button onclick="calculateMagic()">計算</button>
         </div>
 
@@ -114,15 +115,6 @@
             }
 
 
-            var test = { x: reinforce, y: weakness };
-            var test2 = [ // x, yのデータを入力
-            { x: 1, y: 2 },
-            { x: 2, y: 3 },
-            { x: 3, y: 4 },
-            { x: 4, y: 5 }
-            ];
-            console.log(test, typeof(test));
-            console.log(test2, typeof(test2));
             console.log(ary, typeof(ary));
 
             myChart = new Chart(ctx, {
