@@ -4,11 +4,13 @@
     <title>魔法と物理の計算</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.2.0/chart.min.js"></script>
     <script src="calcRedorb.js"></script>
+    <script src="magicSkill.js"></script>
     <style>
         /* タブボタンのスタイル */
         .tab-button {
             display: inline-block;
             padding: 10px;
+            margin: 10px;
             background-color: #f0f0f0;
             cursor: pointer;
         }
@@ -16,14 +18,14 @@
         .form-container {
             display: flex;
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr; /* 3つの列を均等に分割 */
+            grid-template-columns: 1fr 2fr 2fr;
             gap: 10px; /* グリッド間の余白 */
         }
         .form-container .form-column {
             grid-column: 1; /* 左領域 */
             flex-basis:25%;
             flex: 1;
-            padding: 20px;
+            padding: 30px;
         }
         .form-container h2 {
             margin-bottom: 10px;
@@ -35,46 +37,88 @@
         }
         .form-container .form-withoutEle {
             grid-column: 2; /* 中央領域 */
+            padding: 50px;
         }
         .form-container .form-withEle {
             grid-column: 3; /* 右領域 */
+            padding: 50px;
         }
+
     </style>
 </head>
 <body>
     <!-- タブボタン -->
-    <div class="tab-button" onclick="showTab('magic')">魔法計算機</div>
-    <div class="tab-button" onclick="showTab('physics')">物理計算機</div>
+    <div class="tab-button" onclick="showTab('magic')">魔法ダメ計算機</div>
+    <!-- <div class="tab-button" onclick="showTab('physics')">物理計算機</div> -->
 
     <!-- フォーム -->
     <div class="form-container">
-        <!-- 魔法計算フォーム -->
+        <!-- 魔法ダメ計算フォーム -->
         <div id="magic" class="form-column" style="display: block;">
-            <h2>魔法計算</h2>
-            <p>知識:        <input type="number" id="knowledge" min=0 max=100000 value=1000></p>
-            <p>スキルLv:    <input type="number" id="slv" min=50 max=600  value=100></p>
-            <p>強化値:      <input type="number" id="reinforce" min=0 max=600  value=300></p>
-            <p>弱化値:      <input type="number" id="weakness" min=0 max=240  value=120></p>
-            <p>魔法抵抗:      <input type="number" id="weakness" min=-90 max=90  value=0></p>
+            <h2>魔法ダメ計算</h2>
+
+            <select id="first-dropdown" onchange="updateSecondDropdown()">
+                <option value=""></option>
+                <option value="剣士">剣士</option>
+                <option value="戦士">戦士</option>
+                <option value="ウィザード">ウィザード</option>
+                <option value="アーチャー">アーチャー</option>
+                <option value="ランサー">ランサー</option>
+                <option value="リトルウィッチ">リトルウィッチ</option>
+                <option value="ネクロマンサー">ネクロマンサー</option>
+                <option value="霊術師">霊術師</option>
+                <option value="光奏師">光奏師</option>
+            </select>
+        
+            <br>
+        
+            <select id="second-dropdown">
+                <!-- 初期状態では何も表示されない -->
+            </select>
+
+            <p>知識        <br><input type="number" id="knowledge" min=0 max=100000 value=3000></p>
+            <p>スキルLv  <br><input type="number" id="slv" min=50 max=600  value=130></p>
+            <p>強化値    <br><input type="number" id="reinforce" min=0 max=600  value=50></p>
+            <p>弱化値    <br><input type="number" id="weakness" min=0 max=240  value=50></p>
+            <p>魔法抵抗    <br><input type="number" id="regist" min=-90 max=90  value=0></p>
+
+            <div>
+                <input type="checkbox" id="isRoot" name="isRoot" checked />
+                <label for="isRoot">√化</label>
+              </div>
+              
             <button onclick="calculateMagic()">計算</button>
         </div>
 
         <!-- 物理計算フォーム -->
         <div id="physics" class="form-column" style="display: none;">
             <h2>物理計算</h2>
-            <p>知識:        <input type="number" placeholder="知識を入力してください"></p>
-            <p>スキルLv:    <input type="number" placeholder="スキルLvを入力してください"></p>
-            <p>強化値:      <input type="number" placeholder="強化値を入力してください"></p>
-            <p>弱化値:      <input type="number" placeholder="弱化値を入力してください"></p>
+            <p>知識      <input type="number" placeholder="知識を入力してください"></p>
+            <p>スキルLv  <input type="number" placeholder="スキルLvを入力してください"></p>
+            <p>強化値    <input type="number" placeholder="強化値を入力してください"></p>
+            <p>弱化値    <input type="number" placeholder="弱化値を入力してください"></p>
             <button onclick="calculatePhysics()">計算</button>
         </div>
 
         <div class="form-withoutEle">
-            <canvas id="scatterChart"></canvas>
+            <canvas id="displament_of_Knowledge"></canvas>
+            <canvas id="displament_of_skill"></canvas>
+        </div>
+        
+        <div class="form-withEle">
+            <canvas id="displament_of_Knowledge_With_elem"></canvas>
+            <canvas id="displament_of_skill_With_elem"></canvas>
         </div>
 
-        <div class="form-withEle">
-            <!-- <canvas id="scatterChart2"></canvas> -->
+        <!-- グラフ描画設定 -->
+        <div class="form-column">
+            <details>
+                <summary>グラフ設定</summary>
+                <p>描画点数(±N)     <br><input type="number" id="point" min=1 max=15  value=5></p>
+                <p>知識変位量       <br><input type="number" id="knowledgeC" min=1 max=10000  value=90></p>
+                <p>スキル変位量     <br><input type="number" id="slvC" min=1 max=16  value=2></p>
+            </details>
+
         </div>
     </div>
 
@@ -89,45 +133,337 @@
             document.getElementById(tabName).style.display = 'block';
         }
 
-        // 魔法計算の処理
+        // 魔法ダメ計算の処理
         function calculateMagic() {
             // inputbox取得
             let knowledge = parseInt(document.getElementById("knowledge").value);
             let slv = parseInt(document.getElementById("slv").value);
             let reinforce = parseInt(document.getElementById("reinforce").value);
             let weakness = parseInt(document.getElementById("weakness").value);
+            let regist = parseInt(document.getElementById("regist").value);
+            let isRoot = document.getElementById("isRoot").checked;
 
-            // ここに魔法計算のロジックを追加
-            console.log(getKnowledgeBonus(knowledge));
-            console.log(tmpThunder(slv));
-            console.log(calcMagicDamage(tmpThunder(slv), knowledge, reinforce, weakness, 0));
-            
-            var k = knowledge.value;
-            var s = slv.value;
+            let point = parseInt(document.getElementById("point").value);
+            let kc = parseInt(document.getElementById("knowledgeC").value);
+            let slvc = parseInt(document.getElementById("slvC").value);
 
-            var ary = [];
+            let selectedSkill = document.getElementById("second-dropdown").value
 
-            
-            for (let i = 0; i < 5; i++) {
-                modifiedsSlv = slv + i * 2 ;
-                damage = calcMagicDamage(tmpThunder(modifiedsSlv), knowledge, reinforce, weakness, 0);
-                ary.push({ x: modifiedsSlv, y: damage });
+            magicSkill = getSkill(selectedSkill);
+
+             // console.log(selectedSkill, typeof(selectedSkill));
+
+            // 描画用配列
+            var displacementOfSkill = [];
+            var displacementOfSkill_min = [];
+            var displacementOfSkill_max = [];
+            var displacementOfSkillWithElem = [];
+            var displacementOfSkillWithElem_min = [];
+            var displacementOfSkillWithElem_max = [];
+            var displacementOfKnowledge = [];
+            var displacementOfKnowledge_min = [];
+            var displacementOfKnowledge_max = [];
+            var displacementOfKnowledgeWithElem = [];
+            var displacementOfKnowledgeWithElem_min = [];
+            var displacementOfKnowledgeWithElem_max = [];
+
+            // グラフタイトル
+            titleOfSkill = `${selectedSkill} 知識${knowledge}固定時のスキル変化`;
+            titleOfSkillWithElem = `${selectedSkill} 知識${knowledge}固定時のスキル変化 エレメあり`;
+
+            titleOfKnowledge = `${selectedSkill} スキル${slv}固定時のスキル変化`;
+            titleOfKnowledgeWithElem = `${selectedSkill} スキル${slv}固定時のスキル変化 エレメあり`;
+
+
+            // 各点のダメージ確認
+            // 知識変化
+            for (let i = 0; i < (point * 2 + 1); i++) {
+                modifiedsknowledge = knowledge + (i - point) * kc ;
+
+                if(modifiedsknowledge <= 0){ continue ;}
+                
+                
+                if(isRoot)
+                {
+                    damage = Math.sqrt(calcMagicDamage(magicSkill.median(slv), modifiedsknowledge, reinforce, weakness, regist) * magicSkill.rateBeforeRoot(slv)) * magicSkill.rateAfterRoot(slv);
+                    damage_min = Math.sqrt(calcMagicDamage(magicSkill.min(slv), modifiedsknowledge, reinforce, weakness, regist) * magicSkill.rateBeforeRoot(slv)) * magicSkill.rateAfterRoot(slv);
+                    damage_max = Math.sqrt(calcMagicDamage(magicSkill.max(slv), modifiedsknowledge, reinforce, weakness, regist) * magicSkill.rateBeforeRoot(slv)) * magicSkill.rateAfterRoot(slv);
+                    damageWithElem = Math.sqrt(calcMagicDamage(magicSkill.median(slv), modifiedsknowledge, reinforce+100, weakness, regist) * magicSkill.rateBeforeRoot(slv)) * magicSkill.rateAfterRoot(slv);
+                    damageWithElem_min = Math.sqrt(calcMagicDamage(magicSkill.min(slv), modifiedsknowledge, reinforce+100, weakness, regist) * magicSkill.rateBeforeRoot(slv)) * magicSkill.rateAfterRoot(slv);
+                    damageWithElem_max = Math.sqrt(calcMagicDamage(magicSkill.max(slv), modifiedsknowledge, reinforce+100, weakness, regist) * magicSkill.rateBeforeRoot(slv)) * magicSkill.rateAfterRoot(slv);
+                }
+                else
+                {
+                    damage = (calcMagicDamage(magicSkill.median(slv), modifiedsknowledge, reinforce, weakness, regist) * magicSkill.rateBeforeRoot(slv)) * magicSkill.rateAfterRoot(slv);
+                    damage_min = (calcMagicDamage(magicSkill.min(slv), modifiedsknowledge, reinforce, weakness, regist) * magicSkill.rateBeforeRoot(slv)) * magicSkill.rateAfterRoot(slv);
+                    damage_max = (calcMagicDamage(magicSkill.max(slv), modifiedsknowledge, reinforce, weakness, regist) * magicSkill.rateBeforeRoot(slv)) * magicSkill.rateAfterRoot(slv);
+                    damageWithElem = (calcMagicDamage(magicSkill.median(slv), modifiedsknowledge, reinforce+100, weakness, regist) * magicSkill.rateBeforeRoot(slv)) * magicSkill.rateAfterRoot(slv);
+                    damageWithElem_min = (calcMagicDamage(magicSkill.min(slv), modifiedsknowledge, reinforce+100, weakness, regist) * magicSkill.rateBeforeRoot(slv)) * magicSkill.rateAfterRoot(slv);
+                    damageWithElem_max = (calcMagicDamage(magicSkill.max(slv), modifiedsknowledge, reinforce+100, weakness, regist) * magicSkill.rateBeforeRoot(slv)) * magicSkill.rateAfterRoot(slv);
+                }
+
+                
+                displacementOfKnowledge.push({ x: modifiedsknowledge, y: damage });
+                displacementOfKnowledge_min.push({ x: modifiedsknowledge, y: damage_min });
+                displacementOfKnowledge_max.push({ x: modifiedsknowledge, y: damage_max });
+                displacementOfKnowledgeWithElem.push({ x: modifiedsknowledge, y: damageWithElem });
+                displacementOfKnowledgeWithElem_min.push({ x: modifiedsknowledge, y: damageWithElem_min });
+                displacementOfKnowledgeWithElem_max.push({ x: modifiedsknowledge, y: damageWithElem_max });
+            }
+
+            // スキル変化
+            for (let i = 0; i < (point * 2 + 1); i++) {
+                modifiedsSlv = slv + (i - point) * slvc ;
+
+                if(modifiedsSlv <= 0){ continue ;}
+                
+                
+                if(isRoot)
+                {
+                    damage = Math.sqrt(calcMagicDamage(magicSkill.median(modifiedsSlv), knowledge, reinforce, weakness, regist) * magicSkill.rateBeforeRoot(modifiedsSlv)) * magicSkill.rateAfterRoot(modifiedsSlv);
+                    damage_min = Math.sqrt(calcMagicDamage(magicSkill.min(modifiedsSlv), knowledge, reinforce, weakness, regist) * magicSkill.rateBeforeRoot(modifiedsSlv)) * magicSkill.rateAfterRoot(modifiedsSlv);
+                    damage_max = Math.sqrt(calcMagicDamage(magicSkill.max(modifiedsSlv), knowledge, reinforce, weakness, regist) * magicSkill.rateBeforeRoot(modifiedsSlv)) * magicSkill.rateAfterRoot(modifiedsSlv);
+                    damageWithElem = Math.sqrt(calcMagicDamage(magicSkill.median(modifiedsSlv), knowledge, reinforce+100, weakness, regist) * magicSkill.rateBeforeRoot(modifiedsSlv)) * magicSkill.rateAfterRoot(modifiedsSlv);
+                    damageWithElem_min = Math.sqrt(calcMagicDamage(magicSkill.min(modifiedsSlv), knowledge, reinforce+100, weakness, regist) * magicSkill.rateBeforeRoot(modifiedsSlv)) * magicSkill.rateAfterRoot(modifiedsSlv);
+                    damageWithElem_max = Math.sqrt(calcMagicDamage(magicSkill.max(modifiedsSlv), knowledge, reinforce+100, weakness, regist) * magicSkill.rateBeforeRoot(modifiedsSlv)) * magicSkill.rateAfterRoot(modifiedsSlv);
+                }
+                else
+                {
+                    damage = (calcMagicDamage(magicSkill.median(modifiedsSlv), knowledge, reinforce, weakness, regist) * magicSkill.rateBeforeRoot(modifiedsSlv)) * magicSkill.rateAfterRoot(modifiedsSlv);
+                    damage_min = (calcMagicDamage(magicSkill.min(modifiedsSlv), knowledge, reinforce, weakness, regist) * magicSkill.rateBeforeRoot(modifiedsSlv)) * magicSkill.rateAfterRoot(modifiedsSlv);
+                    damage_max = (calcMagicDamage(magicSkill.max(modifiedsSlv), knowledge, reinforce, weakness, regist) * magicSkill.rateBeforeRoot(modifiedsSlv)) * magicSkill.rateAfterRoot(modifiedsSlv);
+                    damageWithElem = (calcMagicDamage(magicSkill.median(modifiedsSlv), knowledge, reinforce+100, weakness, regist) * magicSkill.rateBeforeRoot(modifiedsSlv)) * magicSkill.rateAfterRoot(modifiedsSlv);
+                    damageWithElem_min = (calcMagicDamage(magicSkill.min(modifiedsSlv), knowledge, reinforce+100, weakness, regist) * magicSkill.rateBeforeRoot(modifiedsSlv)) * magicSkill.rateAfterRoot(modifiedsSlv);
+                    damageWithElem_max = (calcMagicDamage(magicSkill.max(modifiedsSlv), knowledge, reinforce+100, weakness, regist) * magicSkill.rateBeforeRoot(modifiedsSlv)) * magicSkill.rateAfterRoot(modifiedsSlv);
+                }
+
+                
+                displacementOfSkill.push({ x: modifiedsSlv, y: damage });
+                displacementOfSkill_min.push({ x: modifiedsSlv, y: damage_min });
+                displacementOfSkill_max.push({ x: modifiedsSlv, y: damage_max });
+                displacementOfSkillWithElem.push({ x: modifiedsSlv, y: damageWithElem });
+                displacementOfSkillWithElem_min.push({ x: modifiedsSlv, y: damageWithElem_min });
+                displacementOfSkillWithElem_max.push({ x: modifiedsSlv, y: damageWithElem_max });
             }
 
 
-            console.log(ary, typeof(ary));
+            // 既にグラフを描画済みの場合、削除する
+            if (typeof dosChart !== 'undefined') { dosChart.destroy(); }
+            if (typeof dosEChart !== 'undefined') { dosEChart.destroy(); }
+            if (typeof dokChart !== 'undefined') { dokChart.destroy(); }
+            if (typeof dokEChart !== 'undefined') { dokEChart.destroy(); }
 
-            myChart = new Chart(ctx, {
+            // グラフ描画
+            // スキル変位 エレメなし
+            dosChart = new Chart(dos, {
                 type: 'scatter',
                 data: {
-                    datasets: [{
-                        data: ary
-                    }],
+                    datasets: [
+                    {
+                        data: displacementOfSkill_min,
+                        borderColor: "red",
+                        label:"最小値",
+                        hidden: true,
+                    },
+                    {
+                        data: displacementOfSkill,
+                        borderColor: "green",
+                        label:"中央値"
+                    },
+                    {
+                        data: displacementOfSkill_max,
+                        borderColor: "blue",
+                        label:"最大値",
+                        hidden: true,
+                    },]
                 },
                 options: {
-                    // グラフの設定（必要に応じてカスタマイズ）
-                },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: 'スキル'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'ダメージ'
+                            }
+                        },
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: titleOfSkill
+                        }
+                    }
+                }
             });
+            
+            // スキル変位 エレメあり
+            dosEChart = new Chart(dosE, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                    {
+                        data: displacementOfSkillWithElem_min,
+                        borderColor: "red",
+                        label:"最小値",
+                        hidden: true,
+                    },
+                    {
+                        data: displacementOfSkillWithElem,
+                        borderColor: "green",
+                        label:"中央値"
+                    },
+                    {
+                        data: displacementOfSkillWithElem_max,
+                        borderColor: "blue",
+                        label:"最大値",
+                        hidden: true,
+                    },]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: 'スキル'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'ダメージ'
+                            }
+                        },
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: titleOfSkillWithElem
+                        }
+                    }
+                }
+            });
+
+            // 知識変位 エレメなし
+            console.log(displacementOfKnowledge_min);
+            dokChart = new Chart(dok, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                    {
+                        data: displacementOfKnowledge_min,
+                        borderColor: "red",
+                        label:"最小値",
+                        hidden: false,
+                    },
+                    /*
+                    {
+                        data: displacementOfKnowledge,
+                        borderColor: "green",
+                        label:"中央値"
+                    },
+                    {
+                        data: displacementOfKnowledge_max,
+                        borderColor: "blue",
+                        label:"最大値",
+                        hidden: true,
+                    }, 
+                    */
+                    ]
+                },
+                options: {
+                    /*
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: 'スキル'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'ダメージ'
+                            }
+                        },
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: titleOfKnowledge
+                        }
+                    }
+                    */
+                }
+            });
+            /*
+            // 知識変位 エレメあり
+            dokEChart = new Chart(dokE, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                    {
+                        data: displacementOfKnowledgeWithElem_min,
+                        borderColor: "red",
+                        label:"最小値",
+                        hidden: true,
+                    },
+                    {
+                        data: displacementOfKnowledgeWithElem,
+                        borderColor: "green",
+                        label:"中央値"
+                    },
+                    {
+                        data: displacementOfKnowledgeWithElem_max,
+                        borderColor: "blue",
+                        label:"最大値",
+                        hidden: true,
+                    },]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: 'スキル'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'ダメージ'
+                            }
+                        },
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: titleOfKnowledgeWithElem
+                        }
+                    }
+                }
+            });
+            */
         }
 
         // 物理計算の処理
@@ -138,27 +474,69 @@
 
         // ファイルを読み込んで散布図を表示する部分のコードを追加します
         // 散布図を作成
-        const ctx = document.getElementById('scatterChart');
+        const dos = document.getElementById('displament_of_skill');
+        const dosE = document.getElementById('displament_of_skill_With_elem');
 
-        /*
-        const myChart = new Chart(ctx, {
-            type: 'scatter',
-            data: {
-                datasets: [{
-                    data: [ // x, yのデータを入力
-                    { x: 1, y: 2 },
-                    { x: 2, y: 3 },
-                    { x: 3, y: 4 },
-                    { x: 4, y: 5 }
-                    ],
-                }],
-            },
-            options: {
-                // グラフの設定（必要に応じてカスタマイズ）
-            },
-        });
-        */
-        
+        const dok = document.getElementById('displament_of_knowledge');
+        const dokE = document.getElementById('displament_of_knowledge_With_elem');
+
+        function updateSecondDropdown() {
+            const firstDropdown = document.getElementById("first-dropdown");
+            const secondDropdown = document.getElementById("second-dropdown");
+            const selectedValue = firstDropdown.value;
+
+            // 第一プルダウンの選択に応じて第二プルダウンの選択肢を設定
+            if (selectedValue === "ウィザード") {
+                secondDropdown.innerHTML = `
+                    <option value="メテオシャワー">メテオシャワー</option>
+                    <option value="ウォーターキャノン">ウォーターキャノン</option>
+                    <option value="ライトニングサンダー">ライトニングサンダー</option>
+                    <option value="アースクエイク">アースクエイク</option>
+                `;
+            } else if (selectedValue === "剣士") {
+                secondDropdown.innerHTML = `
+                    <option value="ウォークライ">ウォークライ</option>
+                    `;
+                    // <option value="トワーリングプロテクター">トワーリングプロテクター</option>
+            } else if (selectedValue === "戦士") {
+                secondDropdown.innerHTML = `
+                    <option value="ドラゴンツイスター">ドラゴンツイスター</option>
+                `;
+            } else if (selectedValue === "アーチャー") {
+                secondDropdown.innerHTML = `
+                    <option value="グライディングファイアー">グライディングファイアー</option>
+                    <option value="ウォーターフォール">ウォーターフォール</option>
+                `;
+            } else if (selectedValue === "ランサー") {
+                secondDropdown.innerHTML = `
+                    <option value="ラジアルアーク(風)">ラジアルアーク(風)</option>
+                    <option value="ラジアルアーク(光)">ラジアルアーク(光)</option>
+                    <option value="ファイアー・アンド・アイス(火)">ファイアー・アンド・アイス(火)</option>
+                    <option value="ファイアー・アンド・アイス(水)">ファイアー・アンド・アイス(水)</option>
+                    <option value="ガーディアンポスト(風)">ガーディアンポスト(風)</option>
+                    <option value="ガーディアンポスト(光)">ガーディアンポスト(光)</option>
+                `;
+            } else if (selectedValue === "リトルウィッチ") {
+                secondDropdown.innerHTML = `
+                    <option value="ライトニングワインダー">ライトニングワインダー</option>
+                    <option value="花の乙女スペシャル">花の乙女スペシャル</option>
+                `;
+            } else if (selectedValue === "ネクロマンサー") {
+                secondDropdown.innerHTML = `
+                    <option value="陰謀の影">陰謀の影</option>
+                `;
+            } else if (selectedValue === "霊術師") {
+                secondDropdown.innerHTML = `
+                    <option value="真空斬り">真空斬り</option>
+                `;
+            } else if (selectedValue === "光奏師") {
+                secondDropdown.innerHTML = `
+                    <option value="クリムゾン・アイ">クリムゾン・アイ</option>
+                    <option value="オプティカルホール">オプティカルホール</option>
+                `;
+            }
+            
+        }
     </script>
 </body>
 </html>
