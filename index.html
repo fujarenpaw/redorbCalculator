@@ -53,6 +53,13 @@
             grid-column: 3; /* 右領域 */
             padding: 50px;
         }
+        footer {
+            width: 100%;
+            height: 100px; 
+            text-align: center;
+            padding: 50px 0;
+            background-color: #a9a9a9;
+          }
     </style>
 </head>
 <body>
@@ -136,6 +143,11 @@
 
     </div>
 
+    <footer>
+        <p>バグ報告はwayaまで</p>
+    </footer>
+
+
 
     <script>
         // タブ切り替え
@@ -149,16 +161,6 @@
 
         // 魔法ダメ計算の処理
         function calculateMagic() {
-            /*
-            const dos = document.getElementById('displament_of_skill');
-            const dosE = document.getElementById('displament_of_skill_With_elem');
-    
-            const dok = document.getElementById('displament_of_knowledge');
-            const dokE = document.getElementById('displament_of_knowledge_With_elem');
-    
-            // console.log(typeof(dos), typeof(dosE), typeof(dok), typeof(dokE));
-            console.log((dos), (dosE), (dok), (dokE));
-            */
             // inputbox取得
             let knowledge = parseInt(document.getElementById("knowledge").value);
             let slv = parseInt(document.getElementById("slv").value);
