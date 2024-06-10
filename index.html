@@ -27,6 +27,16 @@
             flex: 1;
             padding: 30px;
         }
+        .form-container .viewSetting {
+            grid-column: 1; /* 左領域 */
+            flex-basis:25%;
+            flex: 1;
+            padding: 30px;
+        }
+        .form-withoutEle3 {
+            grid-column: 2; /* 中央領域 */
+            padding: 50px;
+        }
         .form-container h2 {
             margin-bottom: 10px;
         }
@@ -43,7 +53,6 @@
             grid-column: 3; /* 右領域 */
             padding: 50px;
         }
-
     </style>
 </head>
 <body>
@@ -58,7 +67,7 @@
             <h2>魔法ダメ計算</h2>
 
             <select id="first-dropdown" onchange="updateSecondDropdown()">
-                <option value=""></option>
+                <!-- <option value=""></option> -->
                 <option value="剣士">剣士</option>
                 <option value="戦士">戦士</option>
                 <option value="ウィザード">ウィザード</option>
@@ -76,10 +85,10 @@
                 <!-- 初期状態では何も表示されない -->
             </select>
 
-            <p>知識        <br><input type="number" id="knowledge" min=0 max=100000 value=3000></p>
-            <p>スキルLv  <br><input type="number" id="slv" min=50 max=600  value=130></p>
-            <p>強化値    <br><input type="number" id="reinforce" min=0 max=600  value=50></p>
-            <p>弱化値    <br><input type="number" id="weakness" min=0 max=240  value=50></p>
+            <p>知識        <br><input type="number" id="knowledge" min=0 max=100000 value=1000></p>
+            <p>スキルLv  <br><input type="number" id="slv" min=50 max=600  value=100></p>
+            <p>強化値    <br><input type="number" id="reinforce" min=0 max=600  value=0></p>
+            <p>弱化値    <br><input type="number" id="weakness" min=0 max=240  value=0></p>
             <p>魔法抵抗    <br><input type="number" id="regist" min=-90 max=90  value=0></p>
 
             <div>
@@ -103,23 +112,28 @@
         <div class="form-withoutEle">
             <canvas id="displament_of_Knowledge"></canvas>
             <canvas id="displament_of_skill"></canvas>
+            <br><br>
+            <div id="explanation"></div>
+            <div id="result"></div>
         </div>
         
         <div class="form-withEle">
             <canvas id="displament_of_Knowledge_With_elem"></canvas>
             <canvas id="displament_of_skill_With_elem"></canvas>
         </div>
+        
+        
 
         <!-- グラフ描画設定 -->
-        <div class="form-column">
+        <div class="viewSetting">
             <details>
                 <summary>グラフ設定</summary>
                 <p>描画点数(±N)     <br><input type="number" id="point" min=1 max=15  value=5></p>
                 <p>知識変位量       <br><input type="number" id="knowledgeC" min=1 max=10000  value=90></p>
                 <p>スキル変位量     <br><input type="number" id="slvC" min=1 max=16  value=2></p>
             </details>
-
         </div>
+
     </div>
 
 
@@ -135,6 +149,16 @@
 
         // 魔法ダメ計算の処理
         function calculateMagic() {
+            /*
+            const dos = document.getElementById('displament_of_skill');
+            const dosE = document.getElementById('displament_of_skill_With_elem');
+    
+            const dok = document.getElementById('displament_of_knowledge');
+            const dokE = document.getElementById('displament_of_knowledge_With_elem');
+    
+            // console.log(typeof(dos), typeof(dosE), typeof(dok), typeof(dokE));
+            console.log((dos), (dosE), (dok), (dokE));
+            */
             // inputbox取得
             let knowledge = parseInt(document.getElementById("knowledge").value);
             let slv = parseInt(document.getElementById("slv").value);
@@ -171,8 +195,8 @@
             titleOfSkill = `${selectedSkill} 知識${knowledge}固定時のスキル変化`;
             titleOfSkillWithElem = `${selectedSkill} 知識${knowledge}固定時のスキル変化 エレメあり`;
 
-            titleOfKnowledge = `${selectedSkill} スキル${slv}固定時のスキル変化`;
-            titleOfKnowledgeWithElem = `${selectedSkill} スキル${slv}固定時のスキル変化 エレメあり`;
+            titleOfKnowledge = `${selectedSkill} スキル${slv}固定時の知識変化`;
+            titleOfKnowledgeWithElem = `${selectedSkill} スキル${slv}固定時の知識変化 エレメあり`;
 
 
             // 各点のダメージ確認
@@ -200,6 +224,20 @@
                     damageWithElem = (calcMagicDamage(magicSkill.median(slv), modifiedsknowledge, reinforce+100, weakness, regist) * magicSkill.rateBeforeRoot(slv)) * magicSkill.rateAfterRoot(slv);
                     damageWithElem_min = (calcMagicDamage(magicSkill.min(slv), modifiedsknowledge, reinforce+100, weakness, regist) * magicSkill.rateBeforeRoot(slv)) * magicSkill.rateAfterRoot(slv);
                     damageWithElem_max = (calcMagicDamage(magicSkill.max(slv), modifiedsknowledge, reinforce+100, weakness, regist) * magicSkill.rateBeforeRoot(slv)) * magicSkill.rateAfterRoot(slv);
+                }
+
+                // 画面表示
+                if((i - point) == 0)
+                {
+                    if(isRoot)
+                    {
+                        document.getElementById("explanation").innerText = "【ダメージ(√)】"
+                    }
+                    else
+                    {
+                        document.getElementById("explanation").innerText = "【ダメージ】"
+                    }
+                    document.getElementById("result").innerText = damage_min + " ～ " + damage_max;
                 }
 
                 
@@ -357,7 +395,6 @@
             });
 
             // 知識変位 エレメなし
-            console.log(displacementOfKnowledge_min);
             dokChart = new Chart(dok, {
                 type: 'scatter',
                 data: {
@@ -366,9 +403,8 @@
                         data: displacementOfKnowledge_min,
                         borderColor: "red",
                         label:"最小値",
-                        hidden: false,
+                        hidden: true,
                     },
-                    /*
                     {
                         data: displacementOfKnowledge,
                         borderColor: "green",
@@ -380,18 +416,16 @@
                         label:"最大値",
                         hidden: true,
                     }, 
-                    */
                     ]
                 },
                 options: {
-                    /*
                     scales: {
                         x: {
                             type: 'linear',
                             position: 'bottom',
                             title: {
                                 display: true,
-                                text: 'スキル'
+                                text: '知識'
                             }
                         },
                         y: {
@@ -409,10 +443,8 @@
                             text: titleOfKnowledge
                         }
                     }
-                    */
                 }
             });
-            /*
             // 知識変位 エレメあり
             dokEChart = new Chart(dokE, {
                 type: 'scatter',
@@ -443,7 +475,7 @@
                             position: 'bottom',
                             title: {
                                 display: true,
-                                text: 'スキル'
+                                text: '知識'
                             }
                         },
                         y: {
@@ -463,7 +495,6 @@
                     }
                 }
             });
-            */
         }
 
         // 物理計算の処理
@@ -477,8 +508,10 @@
         const dos = document.getElementById('displament_of_skill');
         const dosE = document.getElementById('displament_of_skill_With_elem');
 
-        const dok = document.getElementById('displament_of_knowledge');
-        const dokE = document.getElementById('displament_of_knowledge_With_elem');
+        const dok = document.getElementById('displament_of_Knowledge');
+        const dokE = document.getElementById('displament_of_Knowledge_With_elem');
+
+        updateSecondDropdown();
 
         function updateSecondDropdown() {
             const firstDropdown = document.getElementById("first-dropdown");
