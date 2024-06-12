@@ -10,10 +10,14 @@
 
         gtag('config', 'G-HKLW1PL6HM');
         </script>
+
+
     <title>魔法と物理の計算</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.2.0/chart.min.js"></script>
     <script src="calcRedorb.js"></script>
     <script src="magicSkill.js"></script>
+    <script src="item.js"></script>
+    <script src="physicalSkill.js"></script>
     <style>
         /* タブボタンのスタイル */
         .tab-button {
@@ -74,12 +78,13 @@
 <body>
     <!-- タブボタン -->
     <div class="tab-button" onclick="showTab('magic')">魔法ダメ計算機</div>
-    <!-- <div class="tab-button" onclick="showTab('physics')">物理計算機</div> -->
+    <div class="tab-button" onclick="showTab('physics')">物理ダメ計算機</div>
 
     <!-- フォーム -->
     <div class="form-container">
         <!-- 魔法ダメ計算フォーム -->
-        <div id="magic" class="form-column" style="display: block;">
+        <!-- <div id="magic" class="form-column" style="display: block;"> -->
+        <div id="magic" class="form-column" style="display: none;">
             <h2>魔法ダメ計算</h2>
 
             <select id="first-dropdown" onchange="updateSecondDropdown()">
@@ -110,18 +115,64 @@
             <div>
                 <input type="checkbox" id="isRoot" name="isRoot" checked />
                 <label for="isRoot">√化</label>
-              </div>
-              
+            </div>
+            
+            <!-- グラフ描画設定 -->
+            <details>
+                <summary>グラフ設定</summary>
+                <p>描画点数(±N)     <br><input type="number" id="point" min=1 max=15  value=5></p>
+                <p>知識変位量       <br><input type="number" id="knowledgeC" min=1 max=10000  value=90></p>
+                <p>スキル変位量     <br><input type="number" id="slvC" min=1 max=16  value=2></p>
+            </details>
             <button onclick="calculateMagic()">計算</button>
+              
         </div>
 
         <!-- 物理計算フォーム -->
-        <div id="physics" class="form-column" style="display: none;">
-            <h2>物理計算</h2>
-            <p>知識      <input type="number" placeholder="知識を入力してください"></p>
-            <p>スキルLv  <input type="number" placeholder="スキルLvを入力してください"></p>
-            <p>強化値    <input type="number" placeholder="強化値を入力してください"></p>
-            <p>弱化値    <input type="number" placeholder="弱化値を入力してください"></p>
+        <div id="physics" class="form-column" style="display: block;">
+        <!-- <div id="physics" class="form-column" style="display: none;"> -->
+            <h2>物理ダメ計算</h2>
+            <select id="first-dropdown-physical" onchange="updateSecondDropdown_physical()">
+                <option value="剣士">剣士</option>
+                <option value="アーチャー">アーチャー</option>
+                <option value="ランサー">ランサー</option>
+                <option value="シーフ">シーフ</option>
+                <option value="リトルウィッチ">リトルウィッチ</option>
+            </select>
+
+            <br>
+
+            <select id="second-dropdown-physical" onchange="update_weaponInfo()">
+                <!-- 初期状態では何も表示されない -->
+            </select>
+
+            <!-- 武器情報 -->
+            <div style="padding: 5px; margin-bottom: 5px; border: 5px double #333333; border-radius: 5px;">
+                <p>武器情報<p>        <br><input type="number" id="weaponMin" min=0 max=300 value=0> ~ <input type="number" id="weaponMax" min=0 max=300 value=0></p>
+                <p>力        <br><input type="number" id="weaponPower" min=0 max=100000 value=0></p>
+                <p>ダメージ%    <br><input type="number" id="weaponDamage" min=0 max=10000  value=0></p>
+                <p>人間 or アンデッド型+%    <br><input type="number" id="weaponFinalDamage" min=0 max=500  value=0></p>
+            </div>
+                <p>補助武器情報(手動入力)        <br><input type="number" id="subweaponMin" min=0 max=300 value=0> ~ <input type="number" id="subweaponMax" min=0 max=300 value=0></p>
+                
+            <!-- 固定ステータス -->
+            <p>力        <br><input type="number" id="power" min=0 max=100000 value=1000></p>
+            <p>スキルLv  <br><input type="number" id="slv_physical" min=50 max=600  value=95></p>
+            <p>ダメージ%    <br><input type="number" id="damage" min=0 max=600  value=700></p>
+            <p>人間 or アンデッド型+%    <br><input type="number" id="finalDamage" min=0 max=500  value=0></p>
+
+            <div>
+                <input type="checkbox" id="isRoot_phy" name="isRoot_phy" checked />
+                <label for="isRoot">√化</label>
+            </div>
+            <!-- グラフ描画設定 -->
+            <details>
+                <summary>グラフ設定</summary>
+                <p>描画点数(±N)     <br><input type="number" id="point" min=1 max=15  value=5></p>
+                <p>力変位量       <br><input type="number" id="powerC" min=1 max=10000  value=90></p>
+                <p>ダメージ変位量     <br><input type="number" id="damageC" min=1 max=600  value=70></p>
+            </details>
+
             <button onclick="calculatePhysics()">計算</button>
         </div>
 
@@ -140,15 +191,7 @@
         
         
 
-        <!-- グラフ描画設定 -->
-        <div class="viewSetting">
-            <details>
-                <summary>グラフ設定</summary>
-                <p>描画点数(±N)     <br><input type="number" id="point" min=1 max=15  value=5></p>
-                <p>知識変位量       <br><input type="number" id="knowledgeC" min=1 max=10000  value=90></p>
-                <p>スキル変位量     <br><input type="number" id="slvC" min=1 max=16  value=2></p>
-            </details>
-        </div>
+
 
     </div>
 
@@ -296,11 +339,7 @@
             }
 
 
-            // 既にグラフを描画済みの場合、削除する
-            if (typeof dosChart !== 'undefined') { dosChart.destroy(); }
-            if (typeof dosEChart !== 'undefined') { dosEChart.destroy(); }
-            if (typeof dokChart !== 'undefined') { dokChart.destroy(); }
-            if (typeof dokEChart !== 'undefined') { dokEChart.destroy(); }
+            destroyChart();
 
             // グラフ描画
             // スキル変位 エレメなし
@@ -508,9 +547,220 @@
             });
         }
 
+        function destroyChart()
+        {
+            // 既にグラフを描画済みの場合、削除する
+            if (typeof dosChart !== 'undefined') { dosChart.destroy(); }
+            if (typeof dosEChart !== 'undefined') { dosEChart.destroy(); }
+            if (typeof dokChart !== 'undefined') { dokChart.destroy(); }
+            if (typeof dokEChart !== 'undefined') { dokEChart.destroy(); }
+            if (typeof doPowerChart !== 'undefined') { doPowerChart.destroy(); }
+            if (typeof doDamageChart !== 'undefined') { doDamageChart.destroy(); }
+        }
+
         // 物理計算の処理
         function calculatePhysics() {
-            // ここに物理計算のロジックを追加
+            // inputbox取得
+            let weaponMin = parseInt(document.getElementById("weaponMin").value) + parseInt(document.getElementById("subweaponMin").value);
+            let weaponMax = parseInt(document.getElementById("weaponMax").value) + parseInt(document.getElementById("subweaponMax").value);
+            let power = parseInt(document.getElementById("weaponPower").value) + parseInt(document.getElementById("power").value);
+            let damageOp = parseInt(document.getElementById("weaponDamage").value) + parseInt(document.getElementById("damage").value);
+            let finalDamage = parseInt(document.getElementById("weaponFinalDamage").value) + parseInt(document.getElementById("finalDamage").value);
+            let slv = parseInt(document.getElementById("slv_physical").value);
+            
+            let character = firstDropdown = document.getElementById("first-dropdown-physical").value;
+            let point = parseInt(document.getElementById("point").value);
+            let pc = parseInt(document.getElementById("powerC").value);
+            let damagec = parseInt(document.getElementById("damageC").value);
+            let isRoot = document.getElementById("isRoot_phy").checked;
+            physicalSkill = getphysicalSkill(character);
+
+            // グラフタイトル
+            titleOfPower = `${physicalSkill.getSkillName()}${slv} ダメージ${damageOp}%固定時の力変化`;
+            titleOfDamage = `${physicalSkill.getSkillName()}${slv} 力${power}固定時のダメージ%変化`;
+
+            // 描画用配列
+            var displacementOfPower = [];
+            var displacementOfPower_min = [];
+            var displacementOfPower_max = [];
+
+            var displacementOfDamage = [];
+            var displacementOfDamage_min = [];
+            var displacementOfDamage_max = [];
+
+            
+            // 各点のダメージ確認
+            // 力変化
+            for (let i = 0; i < (point * 2 + 1); i++) {
+                modifiedspower = power + (i - point) * pc ;
+
+                if(modifiedspower <= 0){ continue ;}
+                
+                console.log(weaponMin, modifiedspower, damageOp, physicalSkill.skillDamage(slv));
+                
+                if(isRoot)
+                {
+                    damage_min = Math.sqrt(calcPhysicalDamage(weaponMin, modifiedspower, damageOp, physicalSkill.skillDamage(slv)) * (1 + (finalDamage / 100)));
+                    damage_max = Math.sqrt(calcPhysicalDamage(weaponMax, modifiedspower, damageOp, physicalSkill.skillDamage(slv)) * (1 + (finalDamage / 100)));
+                    damage = (damage_min + damage_max) / 2;
+                }
+                else
+                {
+                    damage_min = calcPhysicalDamage(weaponMin, modifiedspower, damageOp, physicalSkill.skillDamage(slv)) * (1 + (finalDamage / 100));
+                    damage_max = calcPhysicalDamage(weaponMax, modifiedspower, damageOp, physicalSkill.skillDamage(slv)) * (1 + (finalDamage / 100));
+                    damage = (damage_min + damage_max) / 2;
+                }
+
+                // 画面表示
+                if((i - point) == 0)
+                {
+                    if(isRoot)
+                    {
+                        document.getElementById("explanation").innerText = "【ダメージ(√)】"
+                    }
+                    else
+                    {
+                        document.getElementById("explanation").innerText = "【ダメージ】"
+                    }
+                    document.getElementById("result").innerText = damage_min + " ～ " + damage_max;
+                }
+
+                
+                displacementOfPower.push({ x: modifiedspower, y: damage });
+                displacementOfPower_min.push({ x: modifiedspower, y: damage_min });
+                displacementOfPower_max.push({ x: modifiedspower, y: damage_max });
+            }
+
+            // ダメージ変化
+            for (let i = 0; i < (point * 2 + 1); i++) {
+                modifiedDamage = damageOp + (i - point) * damagec ;
+
+                if(modifiedDamage <= 0){ continue ;}
+                
+                
+                if(isRoot)
+                {
+                    damage_min = Math.sqrt(calcPhysicalDamage(weaponMin, power, modifiedDamage, physicalSkill.skillDamage(slv)) * (1 + (finalDamage / 100)));
+                    damage_max = Math.sqrt(calcPhysicalDamage(weaponMax, power, modifiedDamage, physicalSkill.skillDamage(slv)) * (1 + (finalDamage / 100)));
+                    damage = (damage_min + damage_max) / 2;
+                }
+                else
+                {
+                    damage_min = calcPhysicalDamage(weaponMin, power, modifiedDamage, physicalSkill.skillDamage(slv)) * (1 + (finalDamage / 100));
+                    damage_max = calcPhysicalDamage(weaponMax, power, modifiedDamage, physicalSkill.skillDamage(slv)) * (1 + (finalDamage / 100));
+                    damage = (damage_min + damage_max) / 2;
+                }
+
+                displacementOfDamage.push({ x: modifiedDamage, y: damage });
+                displacementOfDamage_min.push({ x: modifiedDamage, y: damage_min });
+                displacementOfDamage_max.push({ x: modifiedDamage, y: damage_max });
+            }
+
+            destroyChart();
+            // グラフ描画
+            // 力変位
+            doPowerChart = new Chart(doPower, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                    {
+                        data: displacementOfPower_min,
+                        borderColor: "red",
+                        label:"最小値",
+                        hidden: true,
+                    },
+                    {
+                        data: displacementOfPower,
+                        borderColor: "green",
+                        label:"中央値"
+                    },
+                    {
+                        data: displacementOfPower_max,
+                        borderColor: "blue",
+                        label:"最大値",
+                        hidden: true,
+                    },]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: '力'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'ダメージ'
+                            }
+                        },
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: titleOfPower
+                        }
+                    }
+                }
+            });
+
+            // ダメージ変位
+            doDamageChart = new Chart(doDamage, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                    {
+                        data: displacementOfDamage_min,
+                        borderColor: "red",
+                        label:"最小値",
+                        hidden: true,
+                    },
+                    {
+                        data: displacementOfDamage,
+                        borderColor: "green",
+                        label:"中央値"
+                    },
+                    {
+                        data: displacementOfDamage_max,
+                        borderColor: "blue",
+                        label:"最大値",
+                        hidden: true,
+                    },]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: 'ダメージ%(オプション)'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'ダメージ'
+                            }
+                        },
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: titleOfDamage
+                        }
+                    }
+                }
+            });
+
+
         }
 
 
@@ -518,11 +768,16 @@
         // 散布図を作成
         const dos = document.getElementById('displament_of_skill');
         const dosE = document.getElementById('displament_of_skill_With_elem');
-
+        
         const dok = document.getElementById('displament_of_Knowledge');
         const dokE = document.getElementById('displament_of_Knowledge_With_elem');
+        
+        // 面倒なんでチャートは使い回す
+        const doPower = document.getElementById('displament_of_Knowledge');
+        const doDamage = document.getElementById('displament_of_skill');
 
         updateSecondDropdown();
+        updateSecondDropdown_physical();
 
         function updateSecondDropdown() {
             const firstDropdown = document.getElementById("first-dropdown");
@@ -580,6 +835,78 @@
                 `;
             }
             
+        }
+
+        function updateSecondDropdown_physical() {
+            const firstDropdown = document.getElementById("first-dropdown-physical");
+            const secondDropdown = document.getElementById("second-dropdown-physical");
+            const selectedValue = firstDropdown.value;
+
+            // 第一プルダウンの選択に応じて第二プルダウンの選択肢を設定
+            if (selectedValue === "アーチャー") {
+                secondDropdown.innerHTML = `
+                    <option value=""></option>
+                    <option value="インフィニティボウ2">インフィニティボウ2</option>
+                    <option value="インフィニティボウ3">インフィニティボウ3</option>
+                    <option value="インフィニティボウ8">インフィニティボウ8</option>
+                    <option value="インフィニティボウ9">インフィニティボウ9</option>
+                    <option value="インフィニティボウ10">インフィニティボウ10</option>
+                    `;
+                } else if (selectedValue === "剣士") {
+                    secondDropdown.innerHTML = `
+                    <option value=""></option>
+                    <option value="インフィニティソード2">インフィニティソード2</option>
+                    <option value="インフィニティソード3">インフィニティソード3</option>
+                    <option value="インフィニティソード8">インフィニティソード8</option>
+                    <option value="インフィニティソード9">インフィニティソード9</option>
+                    <option value="インフィニティソード10">インフィニティソード10</option>
+                    <option value="デボーンナイフ">デボーンナイフ</option>
+                    `;
+                } else if (selectedValue === "シーフ") {
+                    secondDropdown.innerHTML = `
+                    <option value=""></option>
+                    <option value="インフィニティダガー2">インフィニティダガー2</option>
+                    <option value="インフィニティダガー3">インフィニティダガー3</option>
+                    <option value="インフィニティダガー8">インフィニティダガー8</option>
+                    <option value="インフィニティダガー9">インフィニティダガー9</option>
+                    <option value="インフィニティダガー10">インフィニティダガー10</option>
+                    <option value="ブレイブアックス">ブレイブアックス</option>
+                    <option value="トゥルーリベンジ">トゥルーリベンジ</option>
+                    `;
+                } else if (selectedValue === "ランサー") {
+                    secondDropdown.innerHTML = `
+                    <option value=""></option>
+                    <option value="インフィニティスピア2">インフィニティスピア2</option>
+                    <option value="インフィニティスピア3">インフィニティスピア3</option>
+                    <option value="インフィニティスピア8">インフィニティスピア8</option>
+                    <option value="インフィニティスピア9">インフィニティスピア9</option>
+                    <option value="インフィニティスピア10">インフィニティスピア10</option>
+                    <option value="デスサイズ">デスサイズ</option>
+                    <option value="ファイナルアタック">ファイナルアタック</option>
+                    `;
+                } else if (selectedValue === "リトルウィッチ") {
+                    secondDropdown.innerHTML = `
+                    <option value=""></option>
+                    <option value="帝王ホールLX">帝王ホールLX</option>
+                    <option value="コンテッサ">コンテッサ</option>
+                `;
+            } 
+            
+        }
+
+        function update_weaponInfo(){
+            itemName = document.getElementById("second-dropdown-physical").value;
+            itemInfo = getItem(itemName);
+
+            
+            console.log(itemName, itemInfo);
+
+            // 武器情報を更新
+            document.getElementById('weaponMin').value = itemInfo.weaponMin();
+            document.getElementById('weaponMax').value = itemInfo.weaponMax();
+            document.getElementById('weaponPower').value = itemInfo.power();
+            document.getElementById('weaponDamage').value = itemInfo.damage();
+            document.getElementById('weaponFinalDamage').value = itemInfo.anyPercent();
         }
     </script>
 </body>

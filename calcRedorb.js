@@ -40,6 +40,11 @@ function calcMagicDamage(skillBase, knowledge, reinforce, weakness, regist)
     return damages;
 }
 
+function calcPhysicalDamage(weapon, power, damage, skillDamage)
+{
+    return (1+weapon)*(1+power/200)*(100+damage+skillDamage) / 100;
+}
+
 
 function tmpThunder(skill)
 {
