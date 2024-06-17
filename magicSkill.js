@@ -211,6 +211,27 @@ class Gardian_L extends baseSkill {
         return 4 * slv + 1;
     }
 }
+// シーフ
+class explosionTrap extends baseSkill {
+    min(slv)
+    {
+        return slv * 100 + 15;
+    }
+    max(slv)
+    {
+        return slv * 100 + 45;
+    }
+}
+class poisonousTrap extends baseSkill {
+    min(slv)
+    {
+        return slv * 15;
+    }
+    max(slv)
+    {
+        return slv * 15;
+    }
+}
 
 // リトル
 class LightningWinder extends baseSkill {
@@ -245,6 +266,28 @@ class Conspiracy extends baseSkill {
     max(slv)
     {
         return 15 * slv;
+    }
+}
+
+class needle extends baseSkill {
+    min(slv)
+    {
+        return 25 * slv + 30;
+    }
+    max(slv)
+    {
+        return 25 * slv + 30;
+    }
+}
+
+class curse extends baseSkill {
+    min(slv)
+    {
+        return 15 * slv + 20;
+    }
+    max(slv)
+    {
+        return 15 * slv + 20;
     }
 }
 
@@ -308,8 +351,12 @@ function getSkill(skillName)
     else if(skillName == "ガーディアンポスト(風)"){ return new Gardian_W(skillName) ;}
     else if(skillName == "ガーディアンポスト(光)"){ return new Gardian_L(skillName) ;}
     else if(skillName == "ライトニングワインダー"){ return new LightningWinder(skillName) ;}
+    else if(skillName == "エクスプロージョントラップ"){ return new explosionTrap(skillName) ;}
+    else if(skillName == "ポイズントラップ"){ return new poisonousTrap(skillName) ;}
     else if(skillName == "花の乙女スペシャル"){ return new Flower(skillName) ;}
     else if(skillName == "陰謀の影"){ return new Conspiracy(skillName) ;}
+    else if(skillName == "針のむしろ"){ return new needle(skillName) ;}
+    else if(skillName == "ミラーカーズ"){ return new curse(skillName) ;}
     else if(skillName == "真空斬り"){ return new Vacuum(skillName) ;}
     else if(skillName == "クリムゾン・アイ"){ return new Crimson(skillName) ;}
     else if(skillName == "オプティカルホール"){ return new Opticalhole(skillName) ;}

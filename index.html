@@ -12,7 +12,7 @@
         </script>
 
 
-    <title>魔法と物理の計算</title>
+    <title>RedOrb Calculator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.2.0/chart.min.js"></script>
     <script src="calcRedorb.js"></script>
     <script src="magicSkill.js"></script>
@@ -93,6 +93,7 @@
                 <option value="ウィザード">ウィザード</option>
                 <option value="アーチャー">アーチャー</option>
                 <option value="ランサー">ランサー</option>
+                <option value="シーフ">シーフ</option>
                 <option value="リトルウィッチ">リトルウィッチ</option>
                 <option value="ネクロマンサー">ネクロマンサー</option>
                 <option value="霊術師">霊術師</option>
@@ -793,8 +794,8 @@
             } else if (selectedValue === "剣士") {
                 secondDropdown.innerHTML = `
                     <option value="ウォークライ">ウォークライ</option>
+                    <option value="トワーリングプロテクター">トワーリングプロテクター</option>
                     `;
-                    // <option value="トワーリングプロテクター">トワーリングプロテクター</option>
             } else if (selectedValue === "戦士") {
                 secondDropdown.innerHTML = `
                     <option value="ドラゴンツイスター">ドラゴンツイスター</option>
@@ -813,7 +814,12 @@
                     <option value="ガーディアンポスト(風)">ガーディアンポスト(風)</option>
                     <option value="ガーディアンポスト(光)">ガーディアンポスト(光)</option>
                 `;
-            } else if (selectedValue === "リトルウィッチ") {
+            } else if (selectedValue === "シーフ") {
+                secondDropdown.innerHTML = `
+                    <option value="エクスプロージョントラップ">エクスプロージョントラップ</option>
+                    <option value="ポイズントラップ">ポイズントラップ</option>
+                `;
+            }else if (selectedValue === "リトルウィッチ") {
                 secondDropdown.innerHTML = `
                     <option value="ライトニングワインダー">ライトニングワインダー</option>
                     <option value="花の乙女スペシャル">花の乙女スペシャル</option>
@@ -821,6 +827,8 @@
             } else if (selectedValue === "ネクロマンサー") {
                 secondDropdown.innerHTML = `
                     <option value="陰謀の影">陰謀の影</option>
+                    <option value="針のむしろ">針のむしろ</option>
+                    <option value="ミラーカーズ">ミラーカーズ</option>
                 `;
             } else if (selectedValue === "霊術師") {
                 secondDropdown.innerHTML = `
